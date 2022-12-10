@@ -4,6 +4,7 @@ public class Main {
   public static final Map<Integer, Integer> sizeToFreq = new HashMap<>();
   public static final int ROUTE_LENGTH = 100;
   public static final String LETTERS = "RLRFR";
+  public static final char CHAR_TO_SEARCH = 'R';
   public static final int THREAD_COUNT = ROUTE_LENGTH;
 
   public static void main(String[] args) {
@@ -12,12 +13,12 @@ public class Main {
       new Thread(() -> {
         String route = generateRoute(LETTERS, ROUTE_LENGTH);
         int rCount = (int) route.chars()
-                .filter(ch -> ch == 'R')
+                .filter(ch -> ch == CHAR_TO_SEARCH)
                 .count();
         synchronized (sizeToFreq) {
           if (sizeToFreq.get(rCount) != null) {
             int value = sizeToFreq.get(rCount);
-            sizeToFreq.put(rCount, value + 1);
+            sizeToFreq.put(rCount, ++value);
           } else {
             sizeToFreq.put(rCount, 1);
           }
