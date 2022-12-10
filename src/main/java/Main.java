@@ -1,7 +1,4 @@
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 
 public class Main {
   public static final Map<Integer, Integer> sizeToFreq = new HashMap<>();
@@ -10,13 +7,14 @@ public class Main {
   public static final int THREAD_COUNT = ROUTE_LENGTH;
 
   public static void main(String[] args) {
-    synchronized (sizeToFreq) {
+
     for (int i = 0; i < THREAD_COUNT; i++) {
-        new Thread(() -> {
-          String route = generateRoute(LETTERS, ROUTE_LENGTH);
-          int rCount = (int) route.chars()
-                  .filter(ch -> ch == 'R')
-                  .count();
+      new Thread(() -> {
+        String route = generateRoute(LETTERS, ROUTE_LENGTH);
+        int rCount = (int) route.chars()
+                .filter(ch -> ch == 'R')
+                .count();
+        synchronized (sizeToFreq) {
           if (sizeToFreq.get(rCount) != null) {
             int value = sizeToFreq.get(rCount);
             sizeToFreq.put(rCount, value + 1);
@@ -24,12 +22,11 @@ public class Main {
             sizeToFreq.put(rCount, 1);
           }
         }
-        ).start();
       }
+      ).start();
     }
 
-    int maxValueKey = Collections.max(sizeToFreq.entrySet(), (entry1, entry2) -> entry1.getValue() - entry2.getValue())
-            .getKey();
+    int maxValueKey = Collections.max(sizeToFreq.entrySet(), Comparator.comparingInt(Map.Entry::getValue)).getKey();
 
     System.out.printf("Самое частое количество повторений %d (встретилось %d раз)\n",
             maxValueKey, sizeToFreq.get(maxValueKey));
